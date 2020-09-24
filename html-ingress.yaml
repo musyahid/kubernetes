@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: htmlcv-ingress
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: htmlcv-ingress
+  template:
+    metadata:
+      name: htmlcv-ingress
+      labels:
+        name: htmlcv-ingress
+    spec:
+      containers:
+        - name: htmlcv-ingress
+          image: musyahid/htmlcv:1.0
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: htmlservice-ingress
+spec:
+  selector:
+    name: htmlcv-ingress
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: htmlnets-ingress
+  labels:
+    name: htmlnets-ingress
+spec:
+  rules:
+    - host: musyahid.cv.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: htmlservice-ingress
+              servicePort: 80
